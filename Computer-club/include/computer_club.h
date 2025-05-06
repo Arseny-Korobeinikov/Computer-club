@@ -98,5 +98,6 @@ public:
 };
 
 void printUsage();
+int run_computer_club(const std::string &input_file_path, std::ostream &output_stream);
 
 #endif // COMPUTER_CLUB_H

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "computer_club.h"
+#include "include/computer_club.h"
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -68,55 +68,62 @@ TEST(ClassTimeTests, SubtractionTime)
 
 TEST(StructEventTests, EventToString)
 {
-    Event event;
-    event.client_name = "Bobi Bi";
-    event.id = 2;
-    event.table_number = 5;
-    event.time = Time::fromString("15:30");
-    event.error_msg = "Bad boy";
+    Event event = {Time::fromString("15:30"), 2, "Bobi Bi", 5, "Bad boy"};
     ASSERT_EQ(event.toString(), "15:30 2 Bobi Bi 5 Bad boy");
 }
 
 TEST(ClassComputerClubTests, OneClientCome)
 {
     ComputerClub club(10, Time::fromString("9:00"), Time::fromString("19:00"), 450);
-    Event event;
-    event.client_name = "Bobi Bi";
-    event.id = 1;
-    event.time = Time::fromString("15:30");
-    ASSERT_NO_THROW(club.processEvent(event));
+    Event event = {Time::fromString("15:30"), 1, "Bobi Bi"};
+    club.processEvent(event);
+
+    std::vector<Event> out = club.getOutputEvents();
+    Event true_event = {Time::fromString("15:30"), 1, "Bobi Bi"};
+    EXPECT_EQ(out[0].toString(), true_event.toString());
+    EXPECT_EQ(out.size(), 1);
 }
 
 TEST(ClassComputerClubTests, OneClientComeAndSit)
 {
     ComputerClub club(10, Time::fromString("9:00"), Time::fromString("19:00"), 450);
-    Event event;
-    event.client_name = "Bobi Bi";
-    event.id = 1;
-    event.time = Time::fromString("15:30");
-    ASSERT_NO_THROW(club.processEvent(event));
+    Event event = {Time::fromString("15:30"), 1, "Bobi Bi"};
+    club.processEvent(event);
 
-    event.id = 2;
-    event.time = Time::fromString("15:31");
-    event.table_number = 5;
-    ASSERT_NO_THROW(club.processEvent(event));
+    event = {Time::fromString("15:31"), 2, "Bobi Bi", 5};
+    club.processEvent(event);
+
+    std::vector<Event> out = club.getOutputEvents();
+    Event true_event = {Time::fromString("15:30"), 1, "Bobi Bi"};
+    EXPECT_EQ(out[0].toString(), true_event.toString());
+
+    true_event = {Time::fromString("15:31"), 2, "Bobi Bi", 5};
+    EXPECT_EQ(out[1].toString(), true_event.toString());
+
+    EXPECT_EQ(out.size(), 2);
 }
 
 TEST(ClassComputerClubTests, OneClientNotComeAndSit)
 {
     ComputerClub club(10, Time::fromString("9:00"), Time::fromString("19:00"), 450);
-    Event event;
-    event.client_name = "Bobi Bi";
-    event.id = 2;
-    event.time = Time::fromString("15:31");
-    event.table_number = 5;
+    Event event = {Time::fromString("15:31"), 2, "Bobi Bi"};
     club.processEvent(event);
 
     std::vector<Event> out = club.getOutputEvents();
     Event error_event = {Time::fromString("15:31"), 13, "", 0, "ClientUnknown"};
-    std::cout << out[0].toString() << std::endl
-              << error_event.toString() << std::endl;
-    EXPECT_EQ(out[0].toString(), error_event.toString());
+    EXPECT_EQ(out[1].toString(), error_event.toString());
+}
+
+TEST(ClassComputerClubTests, OneClientComeBeforeOpen)
+{
+    ComputerClub club(10, Time::fromString("9:00"), Time::fromString("19:00"), 450);
+    Event event = {Time::fromString("08:30"), 1, "Bobi Bi", 5};
+
+    club.processEvent(event);
+
+    std::vector<Event> out = club.getOutputEvents();
+    Event error_event = {Time::fromString("08:30"), 13, "", 0, "NotOpenYet"};
+    EXPECT_EQ(out[1].toString(), error_event.toString());
 }
 
 TEST(FileTests, Test1)

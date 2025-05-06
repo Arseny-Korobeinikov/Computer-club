@@ -1,4 +1,4 @@
-#include "computer_club.h"
+#include "include/computer_club.h"
 
 #include <iostream>
 #include <fstream>
@@ -319,10 +319,10 @@ int run_computer_club(const std::string &input_file_path, std::ostream &output_s
 
         // Чтение стоимости часа
         if (!std::getline(input_file, line))
-            throw std::runtime_error("Отсутствует стоимость часа");
+            throw std::runtime_error(line);
         int hour_cost = std::stoi(line);
         if (hour_cost <= 0)
-            throw std::runtime_error("Неверная стоимость часа");
+            throw std::runtime_error(line);
 
         ComputerClub club(table_count, open_time, close_time, hour_cost);
 
@@ -335,7 +335,7 @@ int run_computer_club(const std::string &input_file_path, std::ostream &output_s
             std::istringstream iss(line);
             std::string time_str, id_str;
             if (!(iss >> time_str >> id_str))
-                throw std::runtime_error("Неверный формат события: " + line);
+                throw std::runtime_error(line);
 
             Time time = Time::fromString(time_str);
             int id = std::stoi(id_str);
@@ -347,22 +347,22 @@ int run_computer_club(const std::string &input_file_path, std::ostream &output_s
             if (id == 1 || id == 3 || id == 4)
             {
                 if (!(iss >> event.client_name))
-                    throw std::runtime_error("Отсутствует имя клиента в событии: " + line);
+                    throw std::runtime_error(line);
             }
             else if (id == 2)
             {
                 std::string table_str;
                 if (!(iss >> event.client_name >> table_str))
-                    throw std::runtime_error("Отсутствует имя клиента или номер стола в событии: " + line);
+                    throw std::runtime_error(line);
                 event.table_number = std::stoi(table_str);
                 if (event.table_number < 1 || event.table_number > table_count)
                 {
-                    throw std::runtime_error("Неверный номер стола в событии: " + line);
+                    throw std::runtime_error(line);
                 }
             }
             else
             {
-                throw std::runtime_error("Неизвестный ID события: " + line);
+                throw std::runtime_error(line);
             }
 
             club.processEvent(event);
@@ -392,15 +392,3 @@ int run_computer_club(const std::string &input_file_path, std::ostream &output_s
 
     return 0;
 }
-
-// int main(int argc, char *argv[])
-//{
-//     setlocale(LC_ALL, "Russian");
-//     if (argc != 2)
-//     {
-//         printUsage();
-//         return 1;
-//     }
-//
-//     return run_computer_club(argv[1], std::cout);
-// }

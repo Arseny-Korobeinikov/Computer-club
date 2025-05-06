@@ -4,6 +4,12 @@ project(ComputerClub)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Главный исполняемый файл (если он нужен отдельно)
+add_executable(computer_club 
+    computer_club.cpp
+    sample.cpp
+)
+
 # Подключение GoogleTest через FetchContent
 include(FetchContent)
 FetchContent_Declare(
@@ -14,9 +20,12 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 # Добавляем исполняемый файл для тестов
-add_executable(tests tests.cpp computer_club.cpp)
+add_executable(tests
+    tests.cpp
+    computer_club.cpp
+)
 
-# Включаем папку с .h, если нужно
+# # Включаем папку с .h, если нужно
 target_include_directories(tests PRIVATE
   ${PROJECT_SOURCE_DIR}/include
 )
